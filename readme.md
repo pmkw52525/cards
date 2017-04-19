@@ -1,6 +1,8 @@
-<p align="center">亂數卡片代碼產生器</p>
+<p align="center"><h1>亂數卡片代碼產生器</h1></p>
+
+<hr>
 
 <p align="center">
-test test
+Hello World
 </p>
 
