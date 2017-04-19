@@ -1,0 +1,23 @@
+ body {
+    background-color: #FFFFFF;
+  }
+
+
+.main.container {
+	margin-top: 7em;
+}
+.wireframe {
+	margin-top: 2em;
+}
+.ui.footer.segment {
+	margin: 5em 0em 0em;
+	padding: 5em 0em;
+}
+
+td.noData {
+	text-align: center !important;
+	color: #999
+}
+
+.extGroup [role="addExt"] 				{ padding: 10px 5px 10px 12px; display: none;  }
+.extGroup [role="addExt"]:last-child 	{ display: inline-block; }
