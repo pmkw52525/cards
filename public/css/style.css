@@ -19,5 +19,6 @@ td.noData {
 	color: #999
 }
 
+
 .extGroup [role="addExt"] 				{ padding: 10px 5px 10px 12px; display: none;  }
 .extGroup [role="addExt"]:last-child 	{ display: inline-block; }

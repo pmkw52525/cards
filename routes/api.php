@@ -2,5 +2,9 @@
 
 use Illuminate\Http\Request;
 
-Route::middleware('api')->get('/checkCard', 'CardController@apiCheckCard');
-Route::middleware('api')->get('/useCard',   'CardController@apiUseCard');
+Route::group(['middleware' => ['api']], function(){
+
+	Route::post('/createActivity', 'CardController@apiCreateActivity');
+	Route::post('/checkCard', 'CardController@apiCheckCard');
+	Route::post('/useCard',   'CardController@apiUseCard');
+});

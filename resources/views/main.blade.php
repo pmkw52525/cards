@@ -7,11 +7,12 @@
 
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico"/>
 
-    <script src="js/jquery.js"></script>
-    <script src="js/semantic.min.js"></script>
-    <link href="css/semantic.min.css" rel="stylesheet">
-    <link href="css/icon.min.css" rel="stylesheet" >
-    <link href="css/style.css" rel="stylesheet">
+
+	{!! Html::style( asset('css/semantic.min.css') ) !!}
+	{!! Html::style( asset('css/icon.min.css') ) !!}
+	{!! Html::style( asset('css/style.css') ) !!}
+	{!! Html::script( asset('js/jquery.js') ) !!}
+	{!! Html::script( asset('js/semantic.min.js') ) !!}
 
 	<title>卡片序號產生器</title>
 </head>
@@ -19,8 +20,9 @@
 <body>
 	<div class="ui fixed inverted menu">
 	  <div class="ui container">
-	      	<a href="{{ route('index') }}" class="header item"><i class="home icon"></i> 卡片序號產生器</a>
-      		<a href="{{ route('addCards') }}" class="item"><i class="plus icon"></i> 產生序號</a>
+	      	<a href="{{ route('index') }}" 		class="header item"><i class="home icon"></i> 卡片序號產生器</a>
+      		<a href="{{ route('card.create') }}" class="item"><i class="plus icon"></i> 產生序號</a>
+      		<a href="{{ route('activity.index') }}" 	class="item"><i class="flag icon"></i> 活動</a>
     	</div>
 	</div>
 

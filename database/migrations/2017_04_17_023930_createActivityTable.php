@@ -22,6 +22,7 @@ class CreateActivityTable extends Migration
             $table->date('startDate')->nullable();
             $table->date('endDate')->nullable();
             $table->text('ext')->nullable();
+            $table->text('httpReferer')->nullable();
             $table->timestamps();
         });
     }

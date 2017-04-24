@@ -1,0 +1,6 @@
+[Wed Mar 29 13:27:45.305584 2017] [core:error] [pid 24894:tid 140158707840768] [client 188.165.242.170:47515] AH00126: Invalid URI in request GET HTTP/1.1 HTTP/1.1
+[Fri Apr 21 03:30:44.311446 2017] [ssl:warn] [pid 1162:tid 140365876102912] AH01909: localhost:443:0 server certificate does NOT include an ID which matches the server name
+[Fri Apr 21 03:30:45.154034 2017] [ssl:warn] [pid 1163:tid 140365876102912] AH01909: localhost:443:0 server certificate does NOT include an ID which matches the server name
+[Fri Apr 21 03:30:45.167739 2017] [mpm_event:notice] [pid 1163:tid 140365876102912] AH00489: Apache/2.4.25 (Unix) OpenSSL/1.0.2k configured -- resuming normal operations
+[Fri Apr 21 03:30:45.167776 2017] [core:notice] [pid 1163:tid 140365876102912] AH00094: Command line: '/opt/bitnami/apache2/bin/httpd.bin -f /opt/bitnami/apache2/conf/httpd.conf'
+[Fri Apr 21 06:18:22.563503 2017] [proxy_fcgi:error] [pid 1166:tid 140365562636032] [client 211.72.111.145:43189] AH01071: Got error 'PHP message: PHP Fatal error:  Class 'PHPExcel_Shared_Font' not found in /opt/bitnami/apache2/htdocs/config/excel.php on line 182\n'
