@@ -4,9 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Activity extends Model
+class Card extends Model
 {
-	protected $table = 'activities';
+	protected $table = 'cards';
 
     protected $guarded = ['id'];
 }

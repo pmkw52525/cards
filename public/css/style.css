@@ -2,6 +2,20 @@
     background-color: #FFFFFF;
   }
 
+/* For modern browsers */
+.clearfix:before,
+.clearfix:after {
+    content:"";
+    display:table;
+    line-height: 0;
+}
+.clearfix:after {
+    clear:both;
+}
+/* For IE 6/7 (trigger hasLayout) */
+.clearfix {
+    zoom:1;
+}
 
 .main.container {
 	margin-top: 7em;
@@ -19,9 +33,11 @@ td.noData {
 	color: #999
 }
 
+.content { min-height: 300px }
 
-ul.pagination { list-style: none; }
-ul.pagination li { padding: 5px 12px; display: inline-block; border: 1px solid #ccc; border-radius: 5px }
+div.pager { text-align: center; margin: 15px }
+
+i.search  { pointer-events: visible !important; cursor: pointer  !important; }
 
 .extGroup [role="addExt"] 				{ padding: 10px 5px 10px 12px; display: none;  }
 .extGroup [role="addExt"]:last-child 	{ display: inline-block; }

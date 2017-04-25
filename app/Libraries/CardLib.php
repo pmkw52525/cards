@@ -2,6 +2,9 @@
 
 use DB, Input;
 
+use App\Activity,
+	App\Card;
+
 Class CardLib {
 
 	public static $STATUS_ENABLED  = 'enabled';
@@ -23,14 +26,15 @@ Class CardLib {
 	public static $OVERDUE 		 = 'OVERDUE';
 	public static $NOT_OPEN 	 = 'NOT_OPEN';
 
+	// public static function
 
 	public static function getCardExt( $code ) {
 
-		$card = DB::table('cards')->where('code', '=', $code)->first();
+		$card = Card::where('code', '=', $code)->first();
 
 		if ( !$card->activityId ) return '[]';
 
-		$act = DB::table('activities')->where('id', $card->activityId)->first();
+		$act = Activity::where('id', $card->activityId)->first();
 		return $act->ext;
 	}
 
@@ -41,14 +45,14 @@ Class CardLib {
 		$end   = str_pad($end, 10, "0", STR_PAD_LEFT);
 
 		for ( $i = $start; $i <= $end; $i++ ) {
-			DB::table('cards')->where('serialNo', '=', $i)->update(['activityId' => $activityId]);
+			Card::where('serialNo', '=', $i)->update(['activityId' => $activityId]);
 		}
 	}
 
 
 	public static function releaseCards( $cardIds ) {
 
-		DB::table('cards')->whereIn('id', $cardIds)->update([
+		Card::whereIn('id', $cardIds)->update([
 			'activityId' => '0',
 			'status' 	 => self::$STATUS_ENABLED,
 			'ext' 	 	 => '[]',
@@ -61,13 +65,13 @@ Class CardLib {
 
 	public static function checkCard( $code ) {
 
-		$card = DB::table('cards')->where('code', '=', $code)->first();
+		$card = Card::where('code', '=', $code)->first();
 
 		if ( !$card ) 			  { return ['status' => false, 'msg' => self::$INVALID_CARD]; }
 
 		if ( !$card->activityId ) { return ['status' => false, 'msg' => self::$UNBIND_CARD];  }
 
-		$act = DB::table('activities')->where('id', $card->activityId)->first();
+		$act = Activity::where('id', $card->activityId)->first();
 
 		$now = date('Y-m-d H:i:s');
 
@@ -80,6 +84,15 @@ Class CardLib {
 	}
 
 	public function updateRange( $activityId, $start, $end ) {
+
+		$start = str_pad($start, 10, "0", STR_PAD_LEFT);
+		$end   = str_pad($end, 10, "0", STR_PAD_LEFT);
+
+		if ( !is_numeric($start) ) { return ['status' => false, 'msg' => self::$WRONG_START_FORMAT	];  }
+		if ( !is_numeric($end) )   { return ['status' => false, 'msg' => self::$WRONG_END_FORMAT		];  }
+		if ( $end - $start < 0 )   { return ['status' => false, 'msg' => self::$START_BIGGER_THEN_END];  }
+
+		$invalidCards = Card::whereBetween('serialNo', [$start, $end])->where('status', '!=', 'enabled')->get();
 
 	}
 
@@ -94,9 +107,9 @@ Class CardLib {
 
 		$count = $end - $start + 1;
 
-		$invalidCards = DB::table('cards')->whereBetween('serialNo', [$start, $end])->where('status', '!=', 'enabled')->get();
-		$bindedCards  = DB::table('cards')->whereBetween('serialNo', [$start, $end])->where('status', '=',  'enabled')->where('activityId', '!=', '0')->get();
-		$cards 		  = DB::table('cards')->whereBetween('serialNo', [$start, $end])->where('status', '=',  'enabled')->where('activityId', '=', '0')->get();
+		$invalidCards = Card::whereBetween('serialNo', [$start, $end])->where('status', '!=', 'enabled')->get();
+		$bindedCards  = Card::whereBetween('serialNo', [$start, $end])->where('status', '=',  'enabled')->where('activityId', '!=', '0')->get();
+		$cards 		  = Card::whereBetween('serialNo', [$start, $end])->where('status', '=',  'enabled')->where('activityId', '=', '0')->get();
 
 		if ( count($bindedCards) > 0 )	{ return ['status' => false, 'msg' => self::$BINDED_CARDS	]; }
 		if ( count($invalidCards) > 0 )	{ return ['status' => false, 'msg' => self::$INVALID_CARDS	]; }

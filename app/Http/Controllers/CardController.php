@@ -2,27 +2,52 @@
 
 namespace App\Http\Controllers;
 
-use DB, Input;
+use DB, Input, Excel, App;
 
 use App\Libraries\CardLib;
+
+use App\Activity,
+	App\Card;
 
 class CardController extends Controller
 {
 
 	public function index() {
 
-		$cards  = DB::table('cards')->paginate(15);
-		$actQry = DB::table('activities')->get();
+		$search = trim( Input::get('search'));
+		$actId 	= trim( Input::get('actId', 0));
+		$status = trim( Input::get('status', ''));
+		$sort 	= trim( Input::get('sort', 'id'));
+		$asc 	= trim( Input::get('asc', 'asc'));
+
+		$serialNo = [];
+		$code = [];
+		$param = [];
+		if ( $search ) $serialNo[]  = [ 'serialNo', 'LIKE',  '%'.$search.'%' ];
+		if ( $search ) $code[]  	= [ 'code', 	 'LIKE',  '%'.$search.'%' ];
+
+		if ( $status ) $param[]   = [ 'status', 	'=', 	$status ];
+		if ( $actId )  $param[]   = [ 'actId',  	'=',	$actId ];
+
+		$cards  = Card::where( $param + $serialNo )->orWhere( $param + $code )->orderBy($sort, $asc)->paginate(100);
+		$actQry = Activity::get();
 
 		$activities = [];
 		foreach ($actQry as $v) {
 			$activities[ $v->id ] = $v;
 		}
 
+		$first = Card::where( $param + $serialNo )->orWhere( $param + $code )->orderBy('serialNo', 'asc')->first();
+		$last  = Card::where( $param + $serialNo )->orWhere( $param + $code )->orderBy('serialNo', 'desc')->first();
 
 		return view('card.index', [
 			'cards' 	 => $cards,
-			'activities' => $activities
+			'search' 	 => $search,
+			'sort' 	 	 => $sort,
+			'asc' 	 	 => $asc,
+			'activities' => $activities,
+			'fromNo' 	 => $first->serialNo,
+			'toNo' 		 => $last->serialNo,
 		]);
 	}
 
@@ -31,6 +56,41 @@ class CardController extends Controller
 
 	public function create() {
 		return view('card.create');
+	}
+
+	public function exportExcel() {
+
+		$from = trim(Input::get('start'));
+		$to   = trim(Input::get('end'));
+
+		$cards  = Card::whereBetween( 'serialNo', [$from, $to] )->orderBy('serialNo', 'asc')->get();
+		$actQry = Activity::get();
+
+		$activities = [];
+		foreach ($actQry as $v) $activities[ $v->id ] = $v->title;
+
+		$data = [];
+		$data[] = ['流水號', '活動', '檢查碼', '狀態'];
+		foreach ($cards as $v) {
+			$d = [];
+			$d[] = $v->serialNo;
+			$d[] = $v->activityId ? $activities[ $v->activityId ] : '-';
+			$d[] = $v->code;
+			$d[] = $v->status == 'enabled' ? '可用' : ( $c->status == 'used' ? '已使用' : '無效');
+
+			$data[] = $d;
+		}
+
+
+		$excel = App::make('excel');
+
+		Excel::create('Cards', function($excel) use ($data) {
+
+		    $excel->sheet('Excel sheet', function($sheet) use ($data) {
+		    	$sheet->fromArray($data, null, 'A1', false, false);
+		    });
+
+		})->download('xls');
 	}
 
 	public function postCreate() {
@@ -61,7 +121,7 @@ class CardController extends Controller
 
 	public function getGenerateNo() {
 
-		$card = DB::table('cards')->orderBy('id','asc')->first();
+		$card = Card::orderBy('id','asc')->first();
 
 		if ( !isset($card) ) return 0;
 
@@ -79,11 +139,11 @@ class CardController extends Controller
 			while ($checking) {
 
 				$code = $this->getCode( $length );
-				$codeExist = DB::table('cards')->where('code', $code)->first();
+				$codeExist = Card::where('code', $code)->first();
 
 				if ( $codeExist ) continue;
 
-				DB::table('cards')->insert([
+				Card::insert([
 					'serialNo'	 => str_pad($generateNo, 4, "0", STR_PAD_LEFT) . str_pad($i, 6, "0", STR_PAD_LEFT),
 					'code' 		 => $prefix . $code,
 					'status'	 => 'enabled',
@@ -114,7 +174,7 @@ class CardController extends Controller
 	public function apiGetInfo() {
 
 		$code = trim(Input::get('code'));
-		$card = DB::Table('cards')->where('code', $code)->first();
+		$card = Card::where('code', $code)->first();
 
 		if ( !$card ) response()->json(['status' => true, 'msg' => 'NO_EXIST_CARD' ]);
 
@@ -144,7 +204,7 @@ class CardController extends Controller
 
 		if ( $test ) 			  return response()->json(['status' => true]);
 
-		DB::table('cards')->where('code', '=', $code)->update([
+		Card::where('code', '=', $code)->update([
 				'status'  => CardLib::$STATUS_USED,
 				'useTime' => date('Y-m-d H:i:s')
 			]);

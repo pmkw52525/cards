@@ -2,7 +2,7 @@
     <thead>
       	<tr>
       		@foreach ($header as $key=>$value)
-      			<th>{{ $value['title'] }}</th>
+      			<th>{!! $value['title'] !!}</th>
         	@endforeach
         </tr>
     </thead>

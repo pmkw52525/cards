@@ -7,16 +7,18 @@ use DB, Input;
 use App\Libraries\CardLib,
 	App\Libraries\ActivityLib;
 
+use App\Activity,
+	App\Card;
 
 class ActivityController extends Controller
 {
 
 	public function index() {
 
-		$activities = DB::table('activities')->get();
+		$activities = Activity::get();
 
 		$actCards = [];
-		$cardQry = DB::table('cards')->where('activityId', '!=', '0')->get();
+		$cardQry = Card::where('activityId', '!=', '0')->get();
 		if ($cardQry) {
 			foreach ($cardQry as $c) {
 				$actCards[ $c->activityId ][] = $c;
@@ -44,7 +46,7 @@ class ActivityController extends Controller
 
 
 
-		isset($param['startCard'])
+		// isset($param['startCard'])
 		// isset($param['endCard'])
 
 
@@ -55,11 +57,11 @@ class ActivityController extends Controller
 
 		$id = trim(Input::get('id'));
 
-		$activity = DB::table('activities')->where('id', '=', $id)->first();
+		$activity = Activity::where('id', '=', $id)->first();
 		if ( !$activity ) { return response()->json(['status' => false, 'msg' => ActivityLib::$NO_EXIST_ACTIVITY]); }
 
 
-		$usedCards = DB::table('cards')->where('activityId', '=', $id)->where('status', '=', 'used')->get();
+		$usedCards = Card::where('activityId', '=', $id)->where('status', '=', 'used')->get();
 
 		if ( count($usedCards) > 0 ) {
 
@@ -72,11 +74,11 @@ class ActivityController extends Controller
 		}
 
 		$cardIds = [];
-		$cardQry = DB::table('cards')->where('activityId', '=', $id)->get();
+		$cardQry = Card::where('activityId', '=', $id)->get();
 		foreach ($cardQry as $c) $cardIds[] = $c->id;
 
 		CardLib::releaseCards($cardIds);
-		DB::table('activities')->where('id', '=', $id)->delete();
+		Activity::where('id', '=', $id)->delete();
 
 		return response()->json(['status' => true]);
 	}
@@ -100,7 +102,7 @@ class ActivityController extends Controller
 		if ( !$title ) 			 { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE]);  }
 
 		$referer    = request()->headers->get('referer');
-		$activityId = DB::table('activities')->insertGetId([
+		$activityId = Activity::insertGetId([
 			'title' 		=> $title,
 			'startDate' 	=> $startDate ?: NULL,
 			'endDate' 		=> $endDate ?: NULL,

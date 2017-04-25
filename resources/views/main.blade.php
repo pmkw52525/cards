@@ -16,8 +16,7 @@
 
 	<title>卡片序號產生器</title>
 </head>
-
-<body>
+<body class="clearfix">
 	<div class="ui fixed inverted menu">
 	  <div class="ui container">
 	      	<a href="{{ route('index') }}" 		class="header item"><i class="home icon"></i> 卡片序號產生器</a>
@@ -26,15 +25,11 @@
     	</div>
 	</div>
 
-	<div class="ui main text container">
+	<div class="ui main text container content">
 		@yield('content')
 	</div>
 
-<!--   <div class="ui inverted vertical footer segment">
-    <div class="ui center aligned container">
-        Copyright © 2017 by ELITE International Education Services. All rights reserved.
-    </div>
-  </div> -->
+  <div class="ui inverted vertical footer segment"><div class="ui center aligned container">Copyright © 2017 by ELITE International Education Services. All rights reserved.</div></div>
 </body>
 
 </html>

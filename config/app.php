@@ -166,6 +166,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Former\FormerServiceProvider::class,
 
+        Maatwebsite\Excel\ExcelServiceProvider::class,
 
         /*
          * Package Service Providers...
@@ -233,6 +234,7 @@ return [
         'Form' => Collective\Html\FormFacade::class,
 	    'Html' => Collective\Html\HtmlFacade::class,
 	    'Former' => Former\Facades\Former::class,
+	    'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];
