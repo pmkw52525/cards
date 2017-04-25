@@ -9,11 +9,9 @@
 	$table['header'] = [
 		[ 'title' => '編號'		],
 		[ 'title' => '流水號'		],
+		[ 'title' => '綁定活動'		],
 		[ 'title' => '檢查碼'		],
 		[ 'title' => '狀態'		],
-		// [ 'title' => '活動名稱'	],
-		// [ 'title' => '開始日期'	],
-		// [ 'title' => '結束日期'	],
 	];
 
 	$data = [];
@@ -21,17 +19,16 @@
     	$data[] = [
 			['data' => $c->id],
 			['data' => $c->serialNo],
+			['data' => $c->activityId ? '<i class="icon check"></i>'. $activities[ $c->activityId ]->title : '-' ],
 			['data' => $c->code],
 			['data' => $c->status],
-			 // $activities[ $c->activityId ]->title,
-			 // isset($activities[ $c->activityId ]->startDate) ? $activities[ $c->activityId ]->startDate : '-',
-			 // isset($activities[ $c->activityId ]->endDate)   ? $activities[ $c->activityId ]->endDate   : '-',
     	];
     }
 
     $table['data'] = $data;
 ?>
         @include('c.table', $table)
+        {{ $cards->links() }}
     </div>
 </div>
 <script>

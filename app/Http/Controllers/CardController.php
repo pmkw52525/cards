@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use DB, Input;
 
+use App\Libraries\CardLib;
+
 class CardController extends Controller
 {
 
 	public function index() {
 
-		$cards  = DB::table('cards')->get();
+		$cards  = DB::table('cards')->paginate(15);
 		$actQry = DB::table('activities')->get();
 
 		$activities = [];
@@ -51,7 +53,7 @@ class CardController extends Controller
 		}
 
 		$generateNo = $this->getGenerateNo();
-		$this->generateCards( $generateNo, $count, $length, $prefix, json_encode($ext));
+		$this->createCards( $generateNo, $count, $length, $prefix, json_encode($ext));
 
 		return redirect( route('index') );
 	}
@@ -67,7 +69,7 @@ class CardController extends Controller
 	}
 
 
-	public function generateCards( $generateNo, $count, $length, $prefix = '', $ext = '') {
+	public function createCards( $generateNo, $count, $length, $prefix = '', $ext = '') {
 
 		$result = [];
 
@@ -109,115 +111,48 @@ class CardController extends Controller
 	}
 
 
-	// public function apiCheckRange() {
+	public function apiGetInfo() {
 
-	// 	$start = trim(Input::get('start'));
-	// 	$end   = trim(Input::get('end'));
+		$code = trim(Input::get('code'));
+		$card = DB::Table('cards')->where('code', $code)->first();
 
-	// 	$result = $this->checkRange( $start, $end );
+		if ( !$card ) response()->json(['status' => true, 'msg' => 'NO_EXIST_CARD' ]);
 
-	// 	return response()->json($result);
-	// }
+		$ext = CardLib::getCardExt( $code );
+
+		return response()->json(['status' => true, 'data' => ['id' => $card->id, 'status' => $card->status, 'ext' => $ext] ]);
+	}
 
 
 	public function apiCheckCard() {
 
 		$code = trim(Input::get('code'));
-		$result = $this->checkCard($code);
+		$result = CardLib::checkCard($code);
 
 		return response()->json($result);
 	}
+
 
 	public function apiUseCard() {
 
 		$code = trim(Input::get('code'));
 		$test = trim(Input::get('test', 0));	// for test mode
 
-		$check = $this->checkCard($code);
+		$check = CardLib::checkCard($code);
 
 		if ( !$check['status'] )  return response()->json(['status' => false, 'msg' => $check['msg'] ]);
 
 		if ( $test ) 			  return response()->json(['status' => true]);
 
-		$card = DB::table('cards')->where('code', '=', $code)->update(['status' => 'used']);
-		return response()->json(['status' => true]);
+		DB::table('cards')->where('code', '=', $code)->update([
+				'status'  => CardLib::$STATUS_USED,
+				'useTime' => date('Y-m-d H:i:s')
+			]);
+
+		$ext = CardLib::getCardExt( $code );
+
+		return response()->json(['status' => true, 'ext' => $ext ]);
 	}
 
 
-	public function checkRange( $start, $end ) {
-
-		$start = str_pad($start, 10, "0", STR_PAD_LEFT);
-		$end   = str_pad($end, 10, "0", STR_PAD_LEFT);
-
-		if ( !is_numeric($start) ) { return ['status' => false, 'msg' => 'Wrong start format'];  }
-		if ( !is_numeric($end) )   { return ['status' => false, 'msg' => 'Wrong end format'];  }
-		if ( $end - $start < 0 )   { return ['status' => false, 'msg' => 'End number must bigger then start'];  }
-
-		$count = $end - $start + 1;
-
-		$invalidCards = DB::table('cards')->whereBetween('serialNo', [$start, $end])->where('status', '!=', 'enabled')->get();
-		$cards 		  = DB::table('cards')->whereBetween('serialNo', [$start, $end])->where('status', '=',  'enabled')->where('activityId', '=', '0')->get();
-
-		if ( count($invalidCards) > 0 )	{ return ['status' => false, 'msg' => 'Some Cards are invalid']; }
-		if ( count($cards) != $count ) 	{ return ['status' => false, 'msg' => 'Some Cards not exist']; }
-
-		return ['status' => true];
-	}
-
-
-	public function apiCreateActivity() {
-
-		$title 		= trim(Input::get('title'));
-		$startDate  = trim(Input::get('startDate'));
-		$endDate    = trim(Input::get('endDate'));
-		$startCard  = trim(Input::get('startCard'));
-		$endCard    = trim(Input::get('endCard'));
-		$ext   		= trim(Input::get('ext'));
-
-
-		$check = $this->checkRange($startCard, $endCard);
-
-		if ( !$check['status'] ) { return response()->json(['status' => false, 'msg' => 'invalid card range']); }
-
-		if ( !$title ) 			 { return response()->json(['status' => false, 'msg' => 'empty title']);  }
-
-		$referer = request()->headers->get('referer');
-		$activityId = DB::table('activities')->insertGetId([
-			'title' 		=> $title,
-			'startDate' 	=> $startDate ?: NULL,
-			'endDate' 		=> $endDate ?: NULL,
-			'httpReferer'	=> $referer ?: '',
-			'ext' 			=> $ext ?: '[]',
-		]);
-
-		$this->bindCard( $activityId, $startCard, $endCard);
-
-		return response()->json(['status' => true, 'id' => $activityId]);
-	}
-
-
-	public function bindCard( $activityId, $start, $end ) {
-
-		$start = str_pad($start, 10, "0", STR_PAD_LEFT);
-		$end   = str_pad($end, 10, "0", STR_PAD_LEFT);
-
-		for ( $i = $start; $i <= $end; $i++ ) {
-			DB::table('cards')->where('serialNo', '=', $i)->update(['activityId' => $activityId]);
-		}
-	}
-
-
-	public function checkCard( $code ) {
-		$card = DB::table('cards')->where('code', '=', $code)->first();
-
-		if ( !$card ) return ['status' => false, 'msg' => '無此卡號'];
-
-		// date
-		// $act = DB::table('activities')->find( $card->activityId );
-		// if ( strtotime($act->startDate) )
-
-		if ( $card->status != 'enabled' ) return ['status' => false, 'msg' => '無效卡號'];
-
-		return ['status' => true, 'msg' => 'ok'];
-	}
 }

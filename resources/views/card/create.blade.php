@@ -17,7 +17,6 @@
 		<div class="required field two wide">
 	        <label>張數</label>
 	        <input type="number" name="count" required number min="1">
-	        <span>流水號  ~  </span>
 	    </div>
 
 
@@ -69,33 +68,33 @@ $(function(){
 			<div role="addExt" class="ui black button basic"><i class="icon plus"></i></div>');
 	});
 
-	$('[role="startDate"]').calendar({
-	  	type: 'date',
-	  	endCalendar: $('[role="endDate"]'),
-	  	formatter: {
-	  		date: function(date) {
-				return formatDate(date);
-		    }
-		}
-	});
+	// $('[role="startDate"]').calendar({
+	//   	type: 'date',
+	//   	endCalendar: $('[role="endDate"]'),
+	//   	formatter: {
+	//   		date: function(date) {
+	// 			return formatDate(date);
+	// 	    }
+	// 	}
+	// });
 
-	$('[role="endDate"]').calendar({
-	  	type: 'date',
-	  	startCalendar: $('[role="startDate"]'),
-	  	formatter: {
-	  		date: function(date) {
-				return formatDate(date);
-		    }
-		}
-	});
+	// $('[role="endDate"]').calendar({
+	//   	type: 'date',
+	//   	startCalendar: $('[role="startDate"]'),
+	//   	formatter: {
+	//   		date: function(date) {
+	// 			return formatDate(date);
+	// 	    }
+	// 	}
+	// });
 
-	function formatDate(date) {
-		if (!date) return '';
-		var day   = date.getDate();
-		var month = date.getMonth() + 1;
-		var year  = date.getFullYear();
-		return year + '/' + month + '/' + day;
-	}
+	// function formatDate(date) {
+	// 	if (!date) return '';
+	// 	var day   = date.getDate();
+	// 	var month = date.getMonth() + 1;
+	// 	var year  = date.getFullYear();
+	// 	return year + '/' + month + '/' + day;
+	// }
 });
 </script>
 
