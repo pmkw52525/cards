@@ -46,8 +46,8 @@ class CardController extends Controller
 			'sort' 	 	 => $sort,
 			'asc' 	 	 => $asc,
 			'activities' => $activities,
-			'fromNo' 	 => $first->serialNo,
-			'toNo' 		 => $last->serialNo,
+			'fromNo' 	 => isset($first->serialNo) ? $first->serialNo : '0',
+			'toNo' 		 => isset($last->serialNo)  ? $last->serialNo  : '0',
 		]);
 	}
 
@@ -202,14 +202,15 @@ class CardController extends Controller
 
 		if ( !$check['status'] )  return response()->json(['status' => false, 'msg' => $check['msg'] ]);
 
-		if ( $test ) 			  return response()->json(['status' => true]);
+		$ext = CardLib::getCardExt( $code );
+
+		if ( $test ) 			  return response()->json(['status' => true, 'ext' => $ext ]);
 
 		Card::where('code', '=', $code)->update([
 				'status'  => CardLib::$STATUS_USED,
 				'useTime' => date('Y-m-d H:i:s')
 			]);
 
-		$ext = CardLib::getCardExt( $code );
 
 		return response()->json(['status' => true, 'ext' => $ext ]);
 	}

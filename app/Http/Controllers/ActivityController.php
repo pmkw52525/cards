@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use DB, Input;
+use DB, Input, Request;
 
 use App\Libraries\CardLib,
 	App\Libraries\ActivityLib;
@@ -36,20 +36,28 @@ class ActivityController extends Controller
 
 		$param = Input::get();
 
-		$title 		= trim(Input::get('title'));
-		$startDate  = trim(Input::get('startDate'));
-		$endDate    = trim(Input::get('endDate'));
-		$startCard  = trim(Input::get('startCard'));
-		$endCard    = trim(Input::get('endCard'));
-		$ext   		= trim(Input::get('ext'));
+		if ( !isset($param['id']) || !$param['id'] ) { return response()->json(['status' => false, 'msg' => ActivityLib::$NO_EXIST_ACTIVITY ]); }
 
+		if ( isset($param['startCard']) && isset($param['endCard']) ) {
+			$check = CardLib::updateRange( $param['id'], $param['startCard'], $param['endCard'] );
 
+			if ( !$check['status'] ) { return response()->json(['status' => false, 'msg' => $check['msg']]); }
 
+		}
 
-		// isset($param['startCard'])
-		// isset($param['endCard'])
+		if ( isset($param['title']) && !$param['title'] ) { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE ]); }
 
+		$activityId = $param['id'];
+		unset($param['id']);
+		unset($param['startCard']);
+		unset($param['endCard']);
 
+		if ( isset($param['startDate']) ) $param['startDate'] = date('Y-m-d', strtotime($param['startDate']));
+		if ( isset($param['endDate']) )   $param['endDate']   = date('Y-m-d', strtotime($param['endDate']));
+
+		Activity::where('id', '=', $activityId)->update($param);
+
+ 		return response()->json(['status' => true]);
 	}
 
 
@@ -70,7 +78,7 @@ class ActivityController extends Controller
 				$used[] = $c->serialNo;
 			}
 
-			return response()->json(['status' => false, 'msg' => 'CARD_USED', 'data' =>  join($used, ', ') ]);
+			return response()->json(['status' => false, 'msg' => ActivityLib::$CARD_USED, 'data' =>  join($used, ', ') ]);
 		}
 
 		$cardIds = [];
@@ -82,8 +90,6 @@ class ActivityController extends Controller
 
 		return response()->json(['status' => true]);
 	}
-
-
 
 
 	public function apiCreateActivity() {
@@ -101,19 +107,19 @@ class ActivityController extends Controller
 
 		if ( !$title ) 			 { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE]);  }
 
-		$referer    = request()->headers->get('referer');
+		$referer    = Request::server('HTTP_REFERER') ?: ( Request::ip() ?: Request::server('HTTP_X_FORWARDED_FOR'));
+
 		$activityId = Activity::insertGetId([
 			'title' 		=> $title,
-			'startDate' 	=> $startDate ?: NULL,
-			'endDate' 		=> $endDate ?: NULL,
+			'startDate' 	=> $startDate ? date('Y-m-d', strtotime($startDate)): NULL,
+			'endDate' 		=> $endDate   ? date('Y-m-d', strtotime($endDate))  : NULL,
 			'httpReferer'	=> $referer ?: '',
 			'ext' 			=> $ext ?: '[]',
 		]);
 
-		CardLib::bindCard( $activityId, $startCard, $endCard);
+		CardLib::bindCard( $activityId, $startCard, $endCard );
 
 		return response()->json(['status' => true, 'id' => $activityId]);
 	}
-
 
 }

@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 
 Route::group(['middleware' => ['api']], function(){
 
-	Route::post('/editActivity', 	'ActivityController@apiUpdateActivity');
+	Route::post('/updateActivity', 	'ActivityController@apiUpdateActivity');
 	Route::post('/createActivity', 	'ActivityController@apiCreateActivity');
 	Route::post('/deleteActivity', 	'ActivityController@apiDeleteActivity');
 

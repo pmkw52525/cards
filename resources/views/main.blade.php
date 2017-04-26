@@ -7,7 +7,6 @@
 
     <link rel="shortcut icon" type="image/ico" href="img/favicon.ico"/>
 
-
 	{!! Html::style( asset('css/semantic.min.css') ) !!}
 	{!! Html::style( asset('css/icon.min.css') ) !!}
 	{!! Html::style( asset('css/style.css') ) !!}

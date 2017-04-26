@@ -23,7 +23,7 @@
 			['data' => $a->startDate ],
 			['data' => $a->endDate],
 			['data' => isset($cards[$a->id]) ? count($cards[$a->id]) : '0'],
-			['data' => $a->httpReferer ],
+			['data' => "<span class='link'>".$a->httpReferer."</span>" ],
     	];
     }
 
@@ -34,6 +34,10 @@
 </div>
 <script>
 $(function(){
+	$('.link').closest('td').css('max-width', 	'160px');
+	$('.link').closest('td').css('overflow', 	'hidden');
+	$('.link').closest('td').css('white-space', 'nowrap');
+	$('.link').closest('td').css('text-overflow', 'ellipsis');
 });
 </script>
 @endsection
