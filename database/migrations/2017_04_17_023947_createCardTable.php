@@ -13,10 +13,8 @@ class CreateCardTable extends Migration
      */
     public function up()
     {
-    	if ( Schema::hasTable('cards') ) Schema::drop('cards');
-
 		Schema::create('cards', function (Blueprint $table) {
-            $table->increments('id');
+         	$table->increments('id');
             $table->integer('activityId')->default(0);
             $table->string('serialNo')->comment = "4碼 activityId, 6 碼依序號碼";
             $table->string('code')->comment = "檢查碼";
@@ -34,6 +32,6 @@ class CreateCardTable extends Migration
      */
     public function down()
     {
-        // Schema::drop('cards');
+        Schema::drop('cards');
     }
 }

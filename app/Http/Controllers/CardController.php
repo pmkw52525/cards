@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use DB, Input, Excel, App;
+use DB, Input, Excel, App, Auth;
 
 use App\Libraries\CardLib;
 
@@ -14,6 +14,7 @@ class CardController extends Controller
 
 	public function index() {
 
+// dd(Auth::user()) ;
 		$search = trim( Input::get('search'));
 		$actId 	= trim( Input::get('actId', 0));
 		$status = trim( Input::get('status', ''));
@@ -115,7 +116,7 @@ class CardController extends Controller
 		$generateNo = $this->getGenerateNo();
 		$this->createCards( $generateNo, $count, $length, $prefix, json_encode($ext));
 
-		return redirect( route('index') );
+		return redirect( CardLib::getIndexLink() );
 	}
 
 
@@ -174,13 +175,13 @@ class CardController extends Controller
 	public function apiGetInfo() {
 
 		$code = trim(Input::get('code'));
-		$card = Card::where('code', $code)->first();
+		$card = Card::where('code', '=', $code)->first();
 
-		if ( !$card ) response()->json(['status' => true, 'msg' => 'NO_EXIST_CARD' ]);
+		if ( !$card )  { return response()->json(['status' => false, 'msg' => CardLib::$NO_EXIST_CARDS ]); }
 
 		$ext = CardLib::getCardExt( $code );
 
-		return response()->json(['status' => true, 'data' => ['id' => $card->id, 'status' => $card->status, 'ext' => $ext] ]);
+		return response()->json(['status' => true, 'data' => ['serialNo' => $card->serialNo, 'status' => $card->status, 'ext' => $ext] ]);
 	}
 
 
@@ -189,7 +190,10 @@ class CardController extends Controller
 		$code = trim(Input::get('code'));
 		$result = CardLib::checkCard($code);
 
-		return response()->json($result);
+		if ( !$result['status'] ) { return response()->json($result); }
+
+		$card = Card::where('code', '=', $code)->first();
+		return response()->json(['status' => true, 'serialNo' => $card->serialNo ]);
 	}
 
 
@@ -204,7 +208,10 @@ class CardController extends Controller
 
 		$ext = CardLib::getCardExt( $code );
 
-		if ( $test ) 			  return response()->json(['status' => true, 'ext' => $ext ]);
+		$card = Card::where('code', '=', $code)->first();
+
+		if ( $test ) return response()->json(['status' => true, 'ext' => $ext, 'serialNo' => $card->serialNo ]);
+
 
 		Card::where('code', '=', $code)->update([
 				'status'  => CardLib::$STATUS_USED,
@@ -212,7 +219,7 @@ class CardController extends Controller
 			]);
 
 
-		return response()->json(['status' => true, 'ext' => $ext ]);
+		return response()->json(['status' => true, 'ext' => $ext, 'serialNo' => $card->serialNo ]);
 	}
 
 

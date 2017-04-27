@@ -11,4 +11,6 @@ Class ActivityLib {
 	// Create Error Msg
 	public static $EMPTY_TITLE  	 = 'EMPTY_TITLE';
 
+	public static function getIndexLink() { return route('activity.index'); }
+
 }

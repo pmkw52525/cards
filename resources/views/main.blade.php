@@ -17,10 +17,11 @@
 </head>
 <body class="clearfix">
 	<div class="ui fixed inverted menu">
-	  <div class="ui container">
-	      	<a href="{{ route('index') }}" 		class="header item"><i class="home icon"></i> 卡片序號產生器</a>
-      		<a href="{{ route('card.create') }}" class="item"><i class="plus icon"></i> 產生序號</a>
-      		<a href="{{ route('activity.index') }}" 	class="item"><i class="flag icon"></i> 活動</a>
+	  	<div class="ui container">
+	      	<a href="{!! App\Libraries\ServiceLib::getIndexLink() !!}" 	class="header item"><i class="home icon"></i> 	 卡片序號產生器</a>
+      		<a href="{!! App\Libraries\CardLib::getCreateLink() !!}" 	class="item">		<i class="plus icon"></i> 	 產生序號</a>
+      		<a href="{!! App\Libraries\ActivityLib::getIndexLink() !!}" class="item">		<i class="flag icon"></i> 	 活動</a>
+      		<a href="{!! App\Libraries\ServiceLib::getLogoutLink() !!}" class="item">		<i class="sign out icon"></i>登出</a>
     	</div>
 	</div>
 
@@ -28,7 +29,9 @@
 		@yield('content')
 	</div>
 
-  <div class="ui inverted vertical footer segment"><div class="ui center aligned container">Copyright © 2017 by ELITE International Education Services. All rights reserved.</div></div>
+  	<div class="ui inverted vertical footer segment">
+  		<div class="ui center aligned container">Copyright © 2017 by ELITE International Education Services. All rights reserved.</div>
+  	</div>
 </body>
 
 </html>

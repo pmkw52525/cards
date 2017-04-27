@@ -27,7 +27,8 @@ Class CardLib {
 	public static $OVERDUE 		 = 'OVERDUE';
 	public static $NOT_OPEN 	 = 'NOT_OPEN';
 
-	// public static function
+	public static function getCreateLink() { return route('card.create'); }
+	public static function getIndexLink() { return route('card.index'); }
 
 	public static function getCardExt( $code ) {
 
@@ -45,9 +46,7 @@ Class CardLib {
 		$start = str_pad($start, 10, "0", STR_PAD_LEFT);
 		$end   = str_pad($end,   10, "0", STR_PAD_LEFT);
 
-		for ( $i = $start; $i <= $end; $i++ ) {
-			Card::where('serialNo', '=', $i)->update(['activityId' => $activityId]);
-		}
+		Card::whereBetween('serialNo', [$start, $end])->update(['activityId' => $activityId]);
 	}
 
 
