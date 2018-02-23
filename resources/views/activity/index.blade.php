@@ -13,6 +13,8 @@
 		[ 'title' => '結束日期'		],
 		[ 'title' => '綁定卡數量'	],
 		[ 'title' => 'Referer'	],
+		[ 'title' => 'Ext'	],
+		// [ 'title' => ''	],
 	];
 
 	$data = [];
@@ -24,6 +26,8 @@
 			['data' => $a->endDate],
 			['data' => isset($cards[$a->id]) ? count($cards[$a->id]) : '0'],
 			['data' => "<span class='link'>".$a->httpReferer."</span>" ],
+			['data' => "<div class='ext'>".$a->ext."</div>"],
+			// ['data' => "<a href='#' role='addCard'><i class='plus square outline icon'></i></a>"],
     	];
     }
 

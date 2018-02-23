@@ -25,7 +25,7 @@
     	</div>
 	</div>
 
-	<div class="ui main text container content">
+	<div class="ui main container content">
 		@yield('content')
 	</div>
 

@@ -41,8 +41,7 @@ class ActivityController extends Controller
 		if ( isset($param['startCard']) && isset($param['endCard']) ) {
 			$check = CardLib::updateRange( $param['id'], $param['startCard'], $param['endCard'] );
 
-			if ( !$check['status'] ) { return response()->json(['status' => false, 'msg' => $check['msg']]); }
-
+			if ( !$check['status'] ) { return response()->json(['status' => false, 'msg' => $check['msg'], 'wrongCard' => $check['wrongCard']] ); }
 		}
 
 		if ( isset($param['title']) && !$param['title'] ) { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE ]); }
@@ -101,14 +100,32 @@ class ActivityController extends Controller
 		$endCard    = trim(Input::get('endCard'));
 		$ext   		= trim(Input::get('ext'));
 
-		$check = CardLib::checkRange($startCard, $endCard);
+		if ( !$title )  { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE]);  }
 
-		if ( !$check['status'] ) { return response()->json(['status' => false, 'msg' => $check['msg']]); }
+		$referer = Request::server('HTTP_REFERER') ?: ( Request::ip() ?: Request::server('HTTP_X_FORWARDED_FOR'));
+		$extData = json_decode( $ext, true);
 
-		if ( !$title ) 			 { return response()->json(['status' => false, 'msg' => ActivityLib::$EMPTY_TITLE]);  }
+		if ( !isset($extData['edmUrl']) ) {
 
-		$referer    = Request::server('HTTP_REFERER') ?: ( Request::ip() ?: Request::server('HTTP_X_FORWARDED_FOR'));
+			$check = CardLib::checkRange($startCard, $endCard);
 
+			if ( !$check['status'] ) { return response()->json( $check ); }
+
+
+			$activityId = Activity::insertGetId([
+				'title' 		=> $title,
+				'startDate' 	=> $startDate ? date('Y-m-d', strtotime($startDate)): NULL,
+				'endDate' 		=> $endDate   ? date('Y-m-d', strtotime($endDate))  : NULL,
+				'httpReferer'	=> $referer ?: '',
+				'ext' 			=> $ext ?: '[]',
+			]);
+
+			CardLib::bindCard( $activityId, $startCard, $endCard );
+			return response()->json(['status' => true, 'id' => $activityId]);
+
+		}
+
+		// edm
 		$activityId = Activity::insertGetId([
 			'title' 		=> $title,
 			'startDate' 	=> $startDate ? date('Y-m-d', strtotime($startDate)): NULL,
@@ -117,9 +134,24 @@ class ActivityController extends Controller
 			'ext' 			=> $ext ?: '[]',
 		]);
 
-		CardLib::bindCard( $activityId, $startCard, $endCard );
+		$code = CardLib::createEdmMainCard( $activityId );
+		return response()->json(['status' => true, 'id' => $activityId, 'code' => $code]);
 
-		return response()->json(['status' => true, 'id' => $activityId]);
+	}
+
+	public function apiActivityCards() {
+
+		$id = trim(Input::get('id'));
+		$cardQry = Card::where('activityId', $id)->get();
+
+		if ( count($cardQry) <= 0 ) return response()->json(['status' => false, 'msg' => 'NO_DATA']);
+
+		$serialNos = [];
+		foreach ($cardQry as $v) {
+			$serialNos[] = $v->serialNo;
+		}
+
+		return response()->json(['status' => true, 'serialNo' => $serialNos]);
 	}
 
 }

@@ -13,7 +13,7 @@ class CreateActivityTable extends Migration
      */
     public function up()
     {
-    	if ( Schema::hasTable('activities') ) Schema::drop('activities');
+    	// if ( Schema::hasTable('activities') ) Schema::drop('activities');
 
 		Schema::create('activities', function (Blueprint $table) {
             $table->increments('id');

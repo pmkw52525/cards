@@ -16,7 +16,7 @@
 
 		<div class="required field two wide">
 	        <label>張數</label>
-	        <input type="number" name="count" required number min="1">
+	        <input type="number" name="count" required number min="1" max="100000">
 	    </div>
 
 
@@ -67,6 +67,10 @@ $(function(){
 			<div class="ui labeled input six wide field"><a class="ui label">參數值</a><input type="text" name="extValue[]"></div>\
 			<div role="addExt" class="ui black button basic"><i class="icon plus"></i></div>');
 	});
+
+    $('form').submit(function(){
+        $('button[type="submit"]').addClass('disabled');
+    });
 
 	// $('[role="startDate"]').calendar({
 	//   	type: 'date',

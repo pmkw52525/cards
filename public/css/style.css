@@ -17,6 +17,19 @@
     zoom:1;
 }
 
+.hint {
+	color: #bbb;
+	font-size: 12px;
+}
+
+.green {
+	color: #198f35;
+}
+
+.red {
+	color: #b21e1e;
+}
+
 .main.container {
 	margin-top: 7em;
 }
@@ -33,6 +46,7 @@ td.noData {
 	color: #999
 }
 
+
 .content { min-height: 300px }
 
 div.pager { text-align: center; margin: 15px }
@@ -41,3 +55,15 @@ i.search  { pointer-events: visible !important; cursor: pointer  !important; }
 
 .extGroup [role="addExt"] 				{ padding: 10px 5px 10px 12px; display: none;  }
 .extGroup [role="addExt"]:last-child 	{ display: inline-block; }
+
+
+
+/*card index*/
+.ui.range {}
+.ui.range .label { border-radius: 0 }
+.ui.range input.start 	{ border-radius: 4px 0 0 4px; width: 120px }
+.ui.range input.end 	{ border-radius: 0 4px 4px 0; width: 120px }
+
+/*activity index*/
+div.ext { width: 350px; text-overflow: ellipsis; overflow: hidden;}
+
